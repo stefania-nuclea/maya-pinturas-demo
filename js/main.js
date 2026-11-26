@@ -215,7 +215,7 @@
     if (!sec || !pin) return;
     var sueltas = $$('[data-vel]', pin), foto = $('#abreFoto'), img = $('img', foto);
     var textos = $('#abreTextos'), pista = $('#abrePista'), titulos = $$('.abre__t', pista);
-    var elP = $('#abreP'), elVivo = $('#abreVivo');
+    var elP = $('#abreP'), elVivo = $('#abreVivo'), elEtq = $('#abreEtq');
     titulos[0].classList.add('activa');
     var TEXTOS = [
       'Desarrollamos y mezclamos cada producto en nuestra planta de El Salto, Jalisco, cuidando que cubra, rinda y conserve su color.',
@@ -302,6 +302,7 @@
         actual = i;
         pista.style.transform = 'translate3d(' + (-i * titulos[0].offsetWidth) + 'px,0,0)';
         titulos.forEach(function (t, k2) { t.classList.toggle('activa', k2 === i); });
+        if (elEtq) elEtq.textContent = '0' + (i + 1);
         elVivo.textContent = TEXTOS[i];
         tipear(elP, TEXTOS[i], 75);
       }
