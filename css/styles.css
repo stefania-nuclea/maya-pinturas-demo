@@ -538,10 +538,10 @@ button, input { font: inherit; color: inherit; }
 .footer__legal a { text-decoration: none; }
 .footer__legal a:hover { text-decoration: underline; }
 .footer__maya {
+  /* logotipo tipográfico (SVG) en Tinta, abajo a la izquierda */
   grid-column: 1; grid-row: 2; align-self: end;
-  margin: 0 0 -.06em -.02em;
-  font-family: var(--f-titulo); font-weight: 900; font-stretch: 100%;
-  font-size: clamp(110px, 13.5vw, 270px); line-height: .8; letter-spacing: -.02em;
+  width: clamp(300px, 42vw, 820px); height: auto;
+  display: block;
 }
 
 /* ---------- Toast ---------- */
@@ -651,7 +651,7 @@ button, input { font: inherit; color: inherit; }
   .footer { grid-template-columns: 1fr; grid-template-rows: auto; row-gap: 40px; min-height: 0; }
   .footer__iso, .footer__der, .footer__maya { grid-column: 1; grid-row: auto; }
   .footer__cols { grid-template-columns: 1fr 1fr; margin-top: 48px; }
-  .footer__maya { font-size: 34vw; }
+  .footer__maya { width: 86vw; }
 }
 
 /* ---------- Movimiento reducido ---------- */
