@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Asap:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=202611261425">
+  <link rel="stylesheet" href="css/styles.css?v=202611261433">
 </head>
 <body>
 
@@ -174,15 +174,15 @@
         <h2 class="abre__titulo">Así llega MAYA<br>a tu tienda<span class="punto">.</span></h2>
       </header>
       <figure class="suelta suelta--1" data-vel="1.1"><img src="assets/img/galeria-mezcla.jpg" alt="Pintura verde mezclándose en un tanque industrial">
-        <figcaption><b>01 La fórmula</b>Desarrollamos y mezclamos cada producto en planta.</figcaption></figure>
+        <figcaption><b>01 La fórmula</b><span data-tipeo>Desarrollamos y mezclamos cada producto en planta.</span></figcaption></figure>
       <figure class="suelta suelta--2" data-vel="0.7"><img src="assets/img/galeria-linea.jpg" alt="Línea de envasado de cubetas MAYAVIN">
-        <figcaption><b>02 El envasado</b>Llenamos y sellamos cada cubeta de 19 L.</figcaption></figure>
+        <figcaption><b>02 El envasado</b><span data-tipeo>Llenamos y sellamos cada cubeta de 19 L.</span></figcaption></figure>
       <figure class="suelta suelta--3" data-vel="1.3"><img src="assets/img/galeria-tarima.jpg" alt="Tarima con cubetas de varias vinílicas MAYA">
-        <figcaption><b>03 Tu pedido</b>Armamos tu tarima combinando productos.</figcaption></figure>
+        <figcaption><b>03 Tu pedido</b><span data-tipeo>Armamos tu tarima combinando productos.</span></figcaption></figure>
       <figure class="suelta suelta--4" data-vel="0.8"><img src="assets/img/galeria-carga.jpg" alt="Montacargas subiendo una tarima de cubetas MAYA a un camión">
-        <figcaption><b>04 La entrega</b>Cargamos tu pedido para tu tienda u obra.</figcaption></figure>
+        <figcaption><b>04 La entrega</b><span data-tipeo>Cargamos tu pedido para tu tienda u obra.</span></figcaption></figure>
       <figure class="suelta suelta--5" data-vel="1.2"><img src="assets/img/galeria-lavable.jpg" alt="Mano limpiando crayones de un muro verde pintado">
-        <figcaption><b>05 En el muro</b>Cubre a la primera y se lava sin perder color.</figcaption></figure>
+        <figcaption><b>05 En el muro</b><span data-tipeo>Cubre a la primera y se lava sin perder color.</span></figcaption></figure>
       <figure class="suelta suelta--deco suelta--6" data-vel="1.6"><img src="assets/img/tierra-roja.jpg" alt=""></figure>
       <figure class="suelta suelta--deco suelta--7" data-vel="0.6"><img src="assets/img/textura-roca.jpg" alt=""></figure>
       <figure class="suelta suelta--deco suelta--8" data-vel="1.4"><img src="assets/img/familia-vinilicas.jpg" alt=""></figure>
@@ -194,17 +194,17 @@
     </div>
 
     <!-- Fase 3: los títulos pasan de derecha a izquierda y cambia el párrafo -->
-    <div class="abre__textos" id="abreTextos" aria-live="polite">
+    <div class="abre__textos" id="abreTextos">
       <div class="abre__pista" id="abrePista">
-        <span class="abre__t">La fórmula</span>
-        <span class="abre__t">El envasado</span>
-        <span class="abre__t">Tu pedido</span>
-        <span class="abre__t">La entrega</span>
-        <span class="abre__t">En el muro</span>
+        <span class="abre__t"><span class="abre__ti">La fórmula</span></span>
+        <span class="abre__t"><span class="abre__ti">El envasado</span></span>
+        <span class="abre__t"><span class="abre__ti">Tu pedido</span></span>
+        <span class="abre__t"><span class="abre__ti">La entrega</span></span>
+        <span class="abre__t"><span class="abre__ti">En el muro</span></span>
       </div>
       <div class="abre__parrafo">
-        <p class="abre__cuenta"><span id="abreNum">01</span> / 05</p>
-        <p id="abreP">Desarrollamos y mezclamos cada producto en nuestra planta de El Salto, Jalisco, cuidando que cubra, rinda y conserve su color.</p>
+        <p class="sr-only" id="abreVivo" aria-live="polite"></p>
+        <p id="abreP" aria-hidden="true">Desarrollamos y mezclamos cada producto en nuestra planta de El Salto, Jalisco, cuidando que cubra, rinda y conserve su color.</p>
       </div>
     </div>
 
@@ -272,8 +272,9 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="js/labels.js?v=202611261425"></script>
+<script src="js/labels.js?v=202611261433"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="js/main.js?v=202611261425"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="js/main.js?v=202611261433"></script>
 </body>
 </html>

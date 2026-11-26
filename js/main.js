@@ -12,6 +12,24 @@
   var clamp = function (v, a, b) { return Math.min(b, Math.max(a, v)); };
   var WHATSAPP = '523331606585'; // provisorio: teléfono de planta hasta confirmar el número de ventas
 
+  /* ---------- Scroll suave con inercia (Lenis, solo rueda/trackpad; no en movimiento reducido) ---------- */
+  var lenis = null;
+  if (window.Lenis && !reduce) {
+    lenis = new window.Lenis({ duration: 1.15, smoothWheel: true });
+    (function raf(t) { lenis.raf(t); requestAnimationFrame(raf); })(performance.now());
+    // Los enlaces internos (#seccion) también se desplazan con Lenis
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href^="#"]');
+      if (!a || a.hasAttribute('data-pronto')) return;
+      var id = a.getAttribute('href');
+      if (id.length < 2) return;
+      var destino = document.querySelector(id);
+      if (!destino) return;
+      e.preventDefault();
+      lenis.scrollTo(destino, { offset: 0 });
+    });
+  }
+
   /* ---------- Datos: Vinílicas (de las etiquetas finales, 24/11) ---------- */
   var TINTA = '#1A1714';
   var BENEF_BASE = ['Alto poder cubriente', 'Resistente al fregado', 'Seca entre 30 y 60 min'];
@@ -184,9 +202,11 @@
 
   /* =========================================================
      DE LA PLANTA A TU TIENDA: 3 fases ligadas al scroll (todas en "pantallas")
-     1) collage: las fotos sueltas suben a distintas velocidades
+     1) collage: las fotos sueltas suben a distintas velocidades y sus textos se tipean
      2) la foto del centro se abre a pantalla completa
-     3) los títulos pasan de derecha a izquierda y cambia el párrafo
+     3) los títulos entran desde una máscara y pasan de derecha a izquierda;
+        el párrafo de cada paso se tipea al aparecer
+     El avance se suaviza (inercia) para que el movimiento no vaya "a saltos".
      Al terminar, la sección queda fija una pantalla más mientras sube Contacto.
      ========================================================= */
   (function () {
@@ -194,7 +214,7 @@
     if (!sec || !pin) return;
     var sueltas = $$('[data-vel]', pin), foto = $('#abreFoto'), img = $('img', foto);
     var textos = $('#abreTextos'), pista = $('#abrePista'), titulos = $$('.abre__t', pista);
-    var parrafo = $('.abre__parrafo', textos), elP = $('#abreP'), elNum = $('#abreNum');
+    var internos = $$('.abre__ti', pista), elP = $('#abreP'), elVivo = $('#abreVivo');
     var TEXTOS = [
       'Desarrollamos y mezclamos cada producto en nuestra planta de El Salto, Jalisco, cuidando que cubra, rinda y conserve su color.',
       'Llenamos y sellamos cada cubeta de 19 L en línea, lista para estibar y transportar.',
@@ -203,62 +223,102 @@
       'Pintura que cubre a la primera, se lava y mantiene su color. Eso es lo que tu cliente nota.'
     ];
     var N = titulos.length;
-    var A = 1.0, B = 0.8, PASO = 0.75, FIN = 0.6;        // largo de cada fase, en pantallas
+    var A = 1.0, B = 0.9, PASO = 0.85, FIN = 0.6;       // largo de cada fase, en pantallas
     var C0 = A + B, TOTAL = C0 + PASO * (N - 1) + FIN;  // scroll fijo total
-    var vh = 0, caja = null, raf = null, actual = -1;
+    var vh = 0, caja = null, actual = -1;
+    var yObj = 0, yAct = 0, corriendo = false;          // avance objetivo y avance suavizado
     var ease = function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+
+    /* ---- Tipeo: escribe el texto letra por letra ---- */
+    function tipear(el, texto, vel) {
+      if (el._tipeo) cancelAnimationFrame(el._tipeo);
+      el.classList.remove('listo');
+      if (reduce) { el.textContent = texto; el.classList.add('listo'); return; }
+      var t0 = null, cps = vel || 70; // caracteres por segundo
+      el.textContent = '';
+      el.classList.add('tipeando');
+      (function paso(ts) {
+        if (t0 === null) t0 = ts;
+        var n = Math.min(texto.length, Math.floor((ts - t0) / 1000 * cps));
+        el.textContent = texto.slice(0, n);
+        if (n < texto.length) el._tipeo = requestAnimationFrame(paso);
+        else { el._tipeo = null; el.classList.remove('tipeando'); el.classList.add('listo'); }
+      })(performance.now());
+    }
+
+    // Los párrafos del collage se tipean cuando la sección entra en pantalla
+    var tipeos = $$('[data-tipeo]', pin).map(function (el) { return { el: el, txt: el.textContent }; });
+    tipeos.forEach(function (o) { o.el.textContent = ''; });
+    var tipeado = false;
+    function tipearCollage() {
+      if (tipeado) return;
+      tipeado = true;
+      tipeos.forEach(function (o, k) { setTimeout(function () { tipear(o.el, o.txt, 60); }, 150 + k * 160); });
+    }
 
     function medir() {
       vh = window.innerHeight;
       var vw = window.innerWidth, movil = vw < 860;
       // +1 pantalla al final: la sección sigue fija mientras Contacto sube encima
       sec.style.height = (vh * (1 + TOTAL + 1)) + 'px';
-      var w = movil ? vw * 0.4 : Math.min(vw * 0.26, vh * 0.42);
-      var h = w * 1.25, cx = vw / 2, cy = vh * (movil ? 0.56 : 0.58);
+      var w = movil ? vw * 0.4 : Math.min(vw * 0.24, vh * 0.38);
+      var h = w * 1.25, cx = vw / 2, cy = vh * (movil ? 0.58 : 0.62);
       caja = { t: cy - h / 2, r: vw - (cx + w / 2), b: vh - (cy + h / 2), l: cx - w / 2 };
-      pintar();
+      leer(); yAct = yObj; pintar();
     }
+    function leer() { yObj = -sec.getBoundingClientRect().top / vh; }
+
     function pintar() {
-      raf = null;
-      var y = -sec.getBoundingClientRect().top / vh;   // pantallas recorridas dentro de la sección
-      if (y < -1 || y > TOTAL + 1.2) return;           // fuera de vista: no hace falta pintar
+      var y = yAct;
+      if (y > -0.6) tipearCollage();
 
       // Fase 1 (y continúa en la 2): las sueltas suben y se desvanecen al abrirse la foto
       var pA = clamp(y / C0, 0, 1), pB = ease(clamp((y - A) / B, 0, 1));
+      var salir = clamp((y - A) / (B * 0.6), 0, 1);
       sueltas.forEach(function (el) {
         var v = +el.getAttribute('data-vel');
-        var dy = reduce ? 0 : -pA * v * 0.55 * vh;
-        el.style.transform = 'translate3d(0,' + dy + 'px,0)';
-        el.style.opacity = 1 - clamp((y - A) / (B * 0.6), 0, 1);
+        el.style.transform = 'translate3d(0,' + (reduce ? 0 : -pA * v * 0.55 * vh) + 'px,0)';
+        el.style.opacity = 1 - salir;
       });
 
       // Fase 2: la caja central se abre a pantalla completa
       var k = 1 - pB;
       foto.style.clipPath = 'inset(' + (caja.t * k) + 'px ' + (caja.r * k) + 'px ' + (caja.b * k) + 'px ' + (caja.l * k) + 'px)';
       img.style.transform = 'scale(' + (1 + 0.18 * k) + ')';
-      textos.style.opacity = clamp((y - (A + B * 0.7)) / (B * 0.3), 0, 1);
+      var velo = clamp((y - (A + B * 0.6)) / (B * 0.4), 0, 1);
+      textos.style.opacity = velo;
 
-      // Fase 3: los títulos pasan; el activo en blanco, los demás atenuados
+      // Fase 3: los títulos entran desde abajo (máscara) y pasan de derecha a izquierda
       var c = clamp((y - C0) / PASO, 0, N - 1);
       var slot = titulos[0].offsetWidth;
       pista.style.transform = 'translate3d(' + (-c * slot) + 'px,0,0)';
+      var entrada = ease(clamp((y - (A + B * 0.75)) / (B * 0.5), 0, 1));
       titulos.forEach(function (t, i) {
         var d = i - c;
-        t.style.opacity = d < 0 ? Math.max(0, 1 + d * 1.6) : 1 - Math.min(1, d) * 0.65;
+        t.style.opacity = d < 0 ? Math.max(0, 1 + d * 1.4) : 1 - Math.min(1, d) * 0.7;
+        var retraso = clamp(entrada * 1.4 - i * 0.15, 0, 1);
+        internos[i].style.transform = 'translate3d(0,' + ((1 - retraso) * 110) + '%,0)';
       });
+
       var i = Math.round(c);
-      if (i !== actual) {
-        var primera = actual === -1;
+      if (velo > 0.9 && i !== actual) {
         actual = i;
-        elNum.textContent = '0' + (i + 1);
-        if (primera || reduce) { elP.textContent = TEXTOS[i]; }
-        else {
-          parrafo.classList.add('cambia');
-          setTimeout(function () { elP.textContent = TEXTOS[actual]; parrafo.classList.remove('cambia'); }, 300);
-        }
+        elVivo.textContent = TEXTOS[i];
+        tipear(elP, TEXTOS[i], 75);
       }
     }
-    window.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(pintar); }, { passive: true });
+
+    // Bucle con inercia: el avance pintado persigue al real
+    function bucle() {
+      yAct += (yObj - yAct) * (reduce ? 1 : 0.09);
+      if (Math.abs(yObj - yAct) < 0.0005) yAct = yObj;
+      if (yAct > -1.2 && yAct < TOTAL + 1.2) pintar();
+      if (yAct !== yObj) requestAnimationFrame(bucle); else corriendo = false;
+    }
+    window.addEventListener('scroll', function () {
+      leer();
+      if (!corriendo) { corriendo = true; requestAnimationFrame(bucle); }
+    }, { passive: true });
     window.addEventListener('resize', medir);
     window.addEventListener('load', medir);
     medir();
@@ -320,7 +380,8 @@
   }
   function irA(i) {
     var r = rangoSeccion();
-    window.scrollTo({ top: r.top + (i / TRAMOS) * r.largo + 2, behavior: reduce ? 'auto' : 'smooth' });
+    var destino = r.top + (i / TRAMOS) * r.largo + 2;
+    if (lenis) lenis.scrollTo(destino); else window.scrollTo({ top: destino, behavior: reduce ? 'auto' : 'smooth' });
   }
 
   function ajustarTitulo() {
