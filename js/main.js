@@ -183,37 +183,55 @@
   });
 
   /* =========================================================
-     DE LA PLANTA A TU TIENDA: el scroll vertical mueve la galería en horizontal
-     (ref. Kove). Las columnas se desfasan en vertical con un parallax leve.
+     DE LA PLANTA A TU TIENDA: fila de fotos + un párrafo. Con cada tramo de
+     scroll la foto siguiente se corre a la izquierda y el párrafo pasa a su lado.
      ========================================================= */
   (function () {
-    var sec = $('#obra'), pista = $('#pista');
-    if (!sec || !pista) return;
-    var cols = $$('[data-par]', pista);
-    var dist = 0, top = 0, raf = null;
+    var sec = $('#obra'), fila = $('#pasosFila');
+    if (!sec || !fila) return;
+    var fotos = $$('.paso-foto', fila), texto = $('#pasoTexto'), elP = $('#pasoP'), elNum = $('#pasoNum');
+    var TEXTOS = [
+      'Desarrollamos y mezclamos cada producto en nuestra planta de El Salto, Jalisco, cuidando que cubra, rinda y conserve su color.',
+      'Llenamos y sellamos cada cubeta de 19 L en línea, lista para estibar y transportar.',
+      'Armamos tu tarima combinando productos y familias, según lo que necesita tu tienda u obra.',
+      'Cargamos tu pedido y te damos seguimiento por WhatsApp, del andén a tu mostrador.',
+      'Pintura que cubre a la primera, se lava y mantiene su color. Eso es lo que tu cliente nota.'
+    ];
+    var N = fotos.length, TRAMO = 0.6; // pantallas de scroll por paso
+    var actual = -1, raf = null, movil = false;
 
     function medir() {
-      dist = Math.max(0, pista.scrollWidth - window.innerWidth);
-      // altura = pantalla fija + recorrido horizontal; después sigue Contacto en flujo normal
-      sec.style.height = (window.innerHeight + dist) + 'px';
-      top = sec.getBoundingClientRect().top + window.scrollY;
-      pintar();
+      movil = window.innerWidth < 860;
+      sec.style.height = (window.innerHeight * (1 + TRAMO * (N - 1)) + 2) + 'px';
+      var alto = fotos[0].offsetHeight;
+      if (movil) { fila.style.height = ''; fila.style.paddingTop = (alto + 14) + 'px'; }
+      else { fila.style.paddingTop = ''; fila.style.height = alto + 'px'; }
+      pintar(true);
     }
-    function pintar() {
-      raf = null;
-      var p = clamp(-sec.getBoundingClientRect().top / (dist || 1), 0, 1);
-      pista.style.transform = 'translate3d(' + (-p * dist) + 'px,0,0)';
-      if (reduce) return;
-      var amp = window.innerHeight * 0.06;
-      cols.forEach(function (c) {
-        var dir = +c.getAttribute('data-par');
-        c.style.transform = 'translate3d(0,' + (dir * (p - 0.5) * 2 * amp) + 'px,0)';
+    function colocar(i) {
+      // fotos 0..i en los primeros slots, el texto en i+1, el resto después
+      fotos.forEach(function (f, k) {
+        f.style.setProperty('--slot', k <= i ? k : k + 1);
+        f.classList.toggle('activa', k === i);
       });
+      texto.style.setProperty('--slot', i + 1);
     }
-    window.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(pintar); }, { passive: true });
+    function pintar(forzar) {
+      raf = null;
+      var recorrido = window.innerHeight * TRAMO;
+      var i = clamp(Math.floor(-sec.getBoundingClientRect().top / recorrido + 0.0001), 0, N - 1);
+      if (i === actual && !forzar) return;
+      var primera = actual === -1;
+      actual = i;
+      colocar(i);
+      elNum.textContent = '0' + (i + 1);
+      if (primera || reduce) { elP.textContent = TEXTOS[i]; return; }
+      texto.classList.add('cambia');
+      setTimeout(function () { elP.textContent = TEXTOS[actual]; texto.classList.remove('cambia'); }, 320);
+    }
+    window.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(function () { pintar(false); }); }, { passive: true });
     window.addEventListener('resize', medir);
     window.addEventListener('load', medir);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(medir);
     medir();
   })();
 

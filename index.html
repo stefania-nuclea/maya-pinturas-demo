@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Asap:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=202611261326">
+  <link rel="stylesheet" href="css/styles.css?v=202611261420">
 </head>
 <body>
 
@@ -163,48 +163,25 @@
   </div>
 </section>
 
-<!-- ============ DE LA PLANTA A TU TIENDA (galería horizontal con el scroll, ref. Kove) ============ -->
-<section class="recorrido" id="obra" aria-label="Así llega MAYA a tu tienda">
-  <div class="recorrido__pin">
-    <div class="recorrido__pista" id="pista">
+<!-- ============ DE LA PLANTA A TU TIENDA (fila de fotos + párrafo que se corre con el scroll) ============ -->
+<section class="pasos" id="obra" aria-label="Así llega MAYA a tu tienda">
+  <div class="pasos__pin">
+    <header class="pasos__head">
+      <p class="eyebrow">De la planta a tu tienda</p>
+      <h2 class="pasos__titulo">Así llega MAYA<br>a tu tienda<span class="punto">.</span></h2>
+    </header>
 
-      <div class="rec-intro">
-        <p class="eyebrow">04 · De la planta a tu tienda</p>
-        <h2 class="rec-intro__titulo">Así llega MAYA a tu tienda<span class="punto">.</span></h2>
-        <p class="rec-intro__texto">Fabricamos, envasamos y surtimos desde nuestra planta en El Salto, Jalisco. Cinco pasos, una sola marca de principio a fin.</p>
-        <p class="rec-intro__pista" aria-hidden="true">Sigue bajando <span>→</span></p>
+    <div class="pasos__fila" id="pasosFila">
+      <figure class="paso-foto"><span class="paso-foto__num">01</span><div class="paso-foto__img"><img src="assets/img/galeria-mezcla.jpg" alt="Pintura verde mezclándose en un tanque industrial"><figcaption>La<br>fórmula</figcaption></div></figure>
+      <figure class="paso-foto"><span class="paso-foto__num">02</span><div class="paso-foto__img"><img src="assets/img/galeria-linea.jpg" alt="Línea de envasado de cubetas MAYAVIN"><figcaption>El<br>envasado</figcaption></div></figure>
+      <figure class="paso-foto"><span class="paso-foto__num">03</span><div class="paso-foto__img"><img src="assets/img/galeria-tarima.jpg" alt="Tarima con cubetas de varias vinílicas MAYA"><figcaption>Tu<br>pedido</figcaption></div></figure>
+      <figure class="paso-foto"><span class="paso-foto__num">04</span><div class="paso-foto__img"><img src="assets/img/galeria-carga.jpg" alt="Montacargas subiendo una tarima de cubetas MAYA a un camión"><figcaption>La<br>entrega</figcaption></div></figure>
+      <figure class="paso-foto"><span class="paso-foto__num">05</span><div class="paso-foto__img"><img src="assets/img/galeria-lavable.jpg" alt="Mano limpiando crayones de un muro verde pintado"><figcaption>En el<br>muro</figcaption></div></figure>
+
+      <div class="paso-texto" id="pasoTexto" aria-live="polite">
+        <p class="paso-texto__cuenta"><span id="pasoNum">01</span> / 05</p>
+        <p class="paso-texto__p" id="pasoP">Desarrollamos y mezclamos cada producto en nuestra planta de El Salto, Jalisco, cuidando que cubra, rinda y conserve su color.</p>
       </div>
-
-      <div class="rec-col" data-par="-1">
-        <figure class="rec-foto" style="--f:3"><img src="assets/img/galeria-mezcla.jpg" alt="Pintura verde mezclándose en un tanque industrial">
-          <figcaption><b>01</b> La fórmula · <span>Desarrollamos y mezclamos cada producto en planta.</span></figcaption></figure>
-        <figure class="rec-foto" style="--f:2"><img src="assets/img/tierra-roja.jpg" alt="Tierra roja con textura"></figure>
-      </div>
-
-      <div class="rec-col rec-col--ancha" data-par="1">
-        <figure class="rec-foto" style="--f:2"><img src="assets/img/textura-roca.jpg" alt="Textura de roca en tonos naranjas"></figure>
-        <figure class="rec-foto" style="--f:3"><img src="assets/img/galeria-linea.jpg" alt="Línea de envasado de cubetas MAYAVIN">
-          <figcaption><b>02</b> El envasado · <span>Llenamos y sellamos cada cubeta de 19 L.</span></figcaption></figure>
-      </div>
-
-      <div class="rec-col" data-par="-1">
-        <figure class="rec-foto" style="--f:3"><img src="assets/img/galeria-tarima.jpg" alt="Tarima con cubetas de varias vinílicas MAYA">
-          <figcaption><b>03</b> Tu pedido · <span>Armamos tu tarima combinando productos.</span></figcaption></figure>
-        <figure class="rec-foto" style="--f:2"><img src="assets/img/galeria-gondola.jpg" alt="Góndola de ferretería con cubetas MAYA"></figure>
-      </div>
-
-      <div class="rec-col rec-col--ancha" data-par="1">
-        <figure class="rec-foto" style="--f:2"><img src="assets/img/familia-vinilicas.jpg" alt="Cubetas de Residencial, Mayavin y Contrato listas para aplicar"></figure>
-        <figure class="rec-foto" style="--f:3"><img src="assets/img/galeria-carga.jpg" alt="Montacargas subiendo una tarima de cubetas MAYA a un camión">
-          <figcaption><b>04</b> La entrega · <span>Cargamos tu pedido para tu tienda u obra.</span></figcaption></figure>
-      </div>
-
-      <div class="rec-col" data-par="-1">
-        <figure class="rec-foto" style="--f:3"><img src="assets/img/galeria-lavable.jpg" alt="Mano limpiando crayones de un muro verde pintado">
-          <figcaption><b>05</b> En el muro · <span>Cubre a la primera y se lava sin perder color.</span></figcaption></figure>
-        <figure class="rec-foto" style="--f:2"><img src="assets/img/cierre-cotizacion.jpg" alt="Cliente revisando una cotización junto a cubetas MAYA"></figure>
-      </div>
-
     </div>
   </div>
 </section>
@@ -270,8 +247,8 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="js/labels.js?v=202611261326"></script>
+<script src="js/labels.js?v=202611261420"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="js/main.js?v=202611261326"></script>
+<script src="js/main.js?v=202611261420"></script>
 </body>
 </html>
