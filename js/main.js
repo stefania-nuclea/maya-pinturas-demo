@@ -288,7 +288,7 @@
       // Fase 2: la caja central se abre a pantalla completa
       var k = 1 - pB;
       foto.style.clipPath = 'inset(' + (caja.t * k) + 'px ' + (caja.r * k) + 'px ' + (caja.b * k) + 'px ' + (caja.l * k) + 'px)';
-      img.style.transform = 'scale(' + (1 + 0.18 * k) + ')';
+      img.style.transform = k > 0.001 ? 'scale(' + (1 + 0.08 * k) + ')' : 'none'; // zoom leve: ampliar más la ablanda
       var velo = clamp((y - (A + B * 0.6)) / (B * 0.4), 0, 1);
       textos.style.opacity = velo;
 

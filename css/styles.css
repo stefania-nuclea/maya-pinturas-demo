@@ -402,8 +402,8 @@ button, input { font: inherit; color: inherit; }
 .suelta--7 { left: 92vw; top: 10vh; width: 9vw; }
 .suelta--8 { left: 2vw;  top: 72vh; width: 9vw; }
 
-.abre__foto { position: absolute; inset: 0; overflow: hidden; will-change: clip-path; }
-.abre__foto img { width: 100%; height: 100%; object-fit: cover; object-position: 15% 60%; /* foto horizontal: encuadre hacia las cubetas (izquierda) */ will-change: transform; }
+.abre__foto { position: absolute; inset: 0; overflow: hidden; }
+.abre__foto img { width: 100%; height: 100%; object-fit: cover; object-position: 15% 60%; /* foto horizontal: encuadre hacia las cubetas (izquierda). Sin will-change: si no, el navegador la estira y se ve borrosa */ }
 
 /* Fase 3, copiando la referencia: título activo a ~18% del borde y ~32% de alto;
    los siguientes a la derecha atenuados (cada 41% del ancho); párrafo angosto
