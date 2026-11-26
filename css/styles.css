@@ -366,7 +366,6 @@ button, input { font: inherit; color: inherit; }
 /* =========================================================
    DE LA PLANTA A TU TIENDA · galería horizontal con el scroll (ref. Kove)
    La sección se fija; el scroll vertical mueve la pista en horizontal.
-   Al final, Contacto sube y la tapa (margin-top negativo en .cierre).
    ========================================================= */
 .recorrido { position: relative; height: 400vh; /* JS lo recalcula según el ancho de la pista */ background: var(--hueso); }
 .recorrido__pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
@@ -411,8 +410,6 @@ button, input { font: inherit; color: inherit; }
 .rec-foto figcaption b { font-family: var(--f-titulo); font-weight: 700; margin-right: 6px; }
 .rec-foto figcaption span { font-weight: 400; opacity: .9; }
 
-/* Contacto sube y tapa la galería fija */
-.cierre { position: relative; z-index: 2; margin-top: -100vh; margin-top: -100svh; box-shadow: 0 -24px 48px rgba(26, 23, 20, .18); }
 
 /* =========================================================
    CIERRE

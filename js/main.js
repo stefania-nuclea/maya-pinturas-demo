@@ -185,7 +185,6 @@
   /* =========================================================
      DE LA PLANTA A TU TIENDA: el scroll vertical mueve la galería en horizontal
      (ref. Kove). Las columnas se desfasan en vertical con un parallax leve.
-     Al terminar el recorrido, Contacto sube y tapa la sección.
      ========================================================= */
   (function () {
     var sec = $('#obra'), pista = $('#pista');
@@ -195,8 +194,8 @@
 
     function medir() {
       dist = Math.max(0, pista.scrollWidth - window.innerWidth);
-      // altura = pantalla fija + recorrido horizontal + una pantalla para que suba Contacto
-      sec.style.height = (window.innerHeight * 2 + dist) + 'px';
+      // altura = pantalla fija + recorrido horizontal; después sigue Contacto en flujo normal
+      sec.style.height = (window.innerHeight + dist) + 'px';
       top = sec.getBoundingClientRect().top + window.scrollY;
       pintar();
     }
