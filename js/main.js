@@ -16,6 +16,7 @@
   var lenis = null;
   if (window.Lenis && !reduce) {
     lenis = new window.Lenis({ duration: 1.15, smoothWheel: true });
+    window.mayaLenis = lenis; // acceso para pruebas desde la consola
     (function raf(t) { lenis.raf(t); requestAnimationFrame(raf); })(performance.now());
     // Los enlaces internos (#seccion) también se desplazan con Lenis
     document.addEventListener('click', function (e) {
@@ -214,7 +215,8 @@
     if (!sec || !pin) return;
     var sueltas = $$('[data-vel]', pin), foto = $('#abreFoto'), img = $('img', foto);
     var textos = $('#abreTextos'), pista = $('#abrePista'), titulos = $$('.abre__t', pista);
-    var internos = $$('.abre__ti', pista), elP = $('#abreP'), elVivo = $('#abreVivo');
+    var elP = $('#abreP'), elVivo = $('#abreVivo');
+    titulos[0].classList.add('activa');
     var TEXTOS = [
       'Desarrollamos y mezclamos cada producto en nuestra planta de El Salto, Jalisco, cuidando que cubra, rinda y conserve su color.',
       'Llenamos y sellamos cada cubeta de 19 L en línea, lista para estibar y transportar.',
@@ -288,21 +290,18 @@
       var velo = clamp((y - (A + B * 0.6)) / (B * 0.4), 0, 1);
       textos.style.opacity = velo;
 
-      // Fase 3: los títulos entran desde abajo (máscara) y pasan de derecha a izquierda
-      var c = clamp((y - C0) / PASO, 0, N - 1);
-      var slot = titulos[0].offsetWidth;
-      pista.style.transform = 'translate3d(' + (-c * slot) + 'px,0,0)';
-      var entrada = ease(clamp((y - (A + B * 0.75)) / (B * 0.5), 0, 1));
-      titulos.forEach(function (t, i) {
-        var d = i - c;
-        t.style.opacity = d < 0 ? Math.max(0, 1 + d * 1.4) : 1 - Math.min(1, d) * 0.7;
-        var retraso = clamp(entrada * 1.4 - i * 0.15, 0, 1);
-        internos[i].style.transform = 'translate3d(0,' + ((1 - retraso) * 110) + '%,0)';
-      });
-
-      var i = Math.round(c);
-      if (velo > 0.9 && i !== actual) {
+      // Fase 3 (como la referencia): la fila entra una sola vez, completa, y luego
+      // cada tramo de scroll la desliza UN lugar con una animación y queda fija.
+      var dentro = velo > 0.85;
+      if (dentro !== textos.classList.contains('entra')) {
+        textos.classList.toggle('entra', dentro);
+        if (!dentro) actual = -1; // al volver a entrar, el párrafo se vuelve a tipear
+      }
+      var i = clamp(Math.floor((y - C0) / PASO + 0.35), 0, N - 1);
+      if (dentro && i !== actual) {
         actual = i;
+        pista.style.transform = 'translate3d(' + (-i * titulos[0].offsetWidth) + 'px,0,0)';
+        titulos.forEach(function (t, k2) { t.classList.toggle('activa', k2 === i); });
         elVivo.textContent = TEXTOS[i];
         tipear(elP, TEXTOS[i], 75);
       }
