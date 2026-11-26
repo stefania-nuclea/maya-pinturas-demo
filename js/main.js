@@ -226,7 +226,9 @@
     ];
     var N = titulos.length;
     var A = 1.0, B = 0.9, PASO = 0.85, FIN = 0.6;       // largo de cada fase, en pantallas
-    var C0 = A + B, TOTAL = C0 + PASO * (N - 1) + FIN;  // scroll fijo total
+    var PASO0 = 1.6;                                     // el primer título pide más scroll para no pasarlo sin querer
+    var C0 = A + B, TOTAL = C0 + PASO0 + PASO * (N - 2) + FIN;  // scroll fijo total
+    var MIN_MS = 900, bloqueado = false, objetivo = 0;   // cada título queda al menos 0,9 s
     var vh = 0, caja = null, actual = -1;
     var yObj = 0, yAct = 0, corriendo = false;          // avance objetivo y avance suavizado
     var ease = function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
@@ -297,15 +299,28 @@
         textos.classList.toggle('entra', dentro);
         if (!dentro) actual = -1; // al volver a entrar, el párrafo se vuelve a tipear
       }
-      var i = clamp(Math.floor((y - C0) / PASO + 0.35), 0, N - 1);
-      if (dentro && i !== actual) {
-        actual = i;
-        pista.style.transform = 'translate3d(' + (-i * titulos[0].offsetWidth) + 'px,0,0)';
-        titulos.forEach(function (t, k2) { t.classList.toggle('activa', k2 === i); });
-        if (elEtq) elEtq.textContent = '0' + (i + 1);
-        elVivo.textContent = TEXTOS[i];
-        tipear(elP, TEXTOS[i], 75);
-      }
+      var yc = y - C0;
+      objetivo = yc < PASO0 ? 0 : clamp(1 + Math.floor((yc - PASO0) / PASO), 0, N - 1);
+      if (dentro) avanzar();
+    }
+
+    // Avanza de a UN título por vez hacia el objetivo, con una pausa mínima entre cambios,
+    // así un scroll fuerte no se saltea pasos ni los cambia "al toque".
+    function mostrarPaso(i) {
+      actual = i;
+      pista.style.transform = 'translate3d(' + (-i * titulos[0].offsetWidth) + 'px,0,0)';
+      titulos.forEach(function (t, k2) { t.classList.toggle('activa', k2 === i); });
+      if (elEtq) elEtq.textContent = '0' + (i + 1);
+      elVivo.textContent = TEXTOS[i];
+      tipear(elP, TEXTOS[i], 75);
+    }
+    function avanzar() {
+      if (bloqueado || objetivo === actual || !textos.classList.contains('entra')) return;
+      // al entrar desde arriba arranca siempre en el primer título; desde abajo, en el que corresponde
+      var entrada = (actual === -1) ? (objetivo < N - 1 ? 0 : objetivo) : null;
+      mostrarPaso(entrada !== null ? entrada : actual + (objetivo > actual ? 1 : -1));
+      bloqueado = true;
+      setTimeout(function () { bloqueado = false; avanzar(); }, reduce ? 0 : MIN_MS);
     }
 
     // Bucle con inercia: el avance pintado persigue al real
