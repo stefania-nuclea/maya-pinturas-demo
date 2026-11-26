@@ -364,59 +364,66 @@ button, input { font: inherit; color: inherit; }
 .card.activa .card__flecha { transform: rotate(-45deg); }
 
 /* =========================================================
-   DE LA PLANTA A TU TIENDA · fila de 5 fotos + un párrafo
-   La sección se fija; con cada tramo de scroll la foto siguiente se corre
-   a la izquierda y el párrafo pasa a su lado con el texto del paso.
-   Cada elemento ocupa un "slot" de 6 (5 fotos + 1 texto); JS define --slot.
+   DE LA PLANTA A TU TIENDA · 3 fases con el scroll
+   1) fotos sueltas con su párrafo que suben a distintas velocidades
+   2) la foto del centro se abre a pantalla completa (clip-path)
+   3) sobre la foto, los títulos pasan de derecha a izquierda y cambia el párrafo
+   Al final, Contacto sube y tapa la sección (margin-top negativo en .cierre).
    ========================================================= */
-.pasos { position: relative; height: 340vh; /* JS lo ajusta */ background: var(--hueso); }
-.pasos__pin {
-  position: sticky; top: 0;
-  height: 100vh; height: 100svh;
-  display: flex; flex-direction: column; justify-content: center;
-  padding: calc(var(--nav-h) + 16px) var(--gutter) 32px;
-  overflow: hidden;
+.abre { position: relative; height: 760vh; /* JS lo ajusta */ background: var(--hueso); }
+.abre__pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+
+.abre__collage { position: absolute; inset: 0; }
+.abre__head {
+  position: absolute; left: 50%; top: calc(var(--nav-h) + 4vh); width: 34vw;
+  margin-left: -17vw; text-align: center;
 }
-.pasos__head { text-align: center; margin-bottom: clamp(28px, 4.5vh, 56px); }
-.pasos__head .eyebrow { margin-bottom: 14px; }
-.pasos__titulo {
-  margin: 0;
+.abre__head .eyebrow { margin-bottom: 12px; }
+.abre__titulo {
+  margin: 0; font-family: var(--f-titulo); font-weight: 500;
+  font-size: clamp(30px, 3.2vw, 54px); line-height: 1.02; letter-spacing: -.03em;
+}
+.suelta { position: absolute; margin: 0; will-change: transform; }
+.suelta img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; }
+.suelta--deco img { aspect-ratio: 3 / 4; }
+.suelta figcaption { margin-top: 10px; font-size: 13px; line-height: 1.35; font-weight: 400; max-width: 22em; }
+.suelta figcaption b { display: block; margin-bottom: 2px; font-family: var(--f-titulo); font-weight: 600; font-size: 14px; }
+.suelta--1 { left: 5vw;  top: 20vh; width: 15vw; }
+.suelta--2 { left: 23vw; top: 60vh; width: 12vw; }
+.suelta--3 { left: 67vw; top: 14vh; width: 13vw; }
+.suelta--4 { left: 81vw; top: 50vh; width: 14vw; }
+.suelta--5 { left: 64vw; top: 78vh; width: 12vw; }
+.suelta--6 { left: 26vw; top: 8vh;  width: 7vw; }
+.suelta--7 { left: 92vw; top: 10vh; width: 9vw; }
+.suelta--8 { left: 2vw;  top: 72vh; width: 9vw; }
+
+.abre__foto { position: absolute; inset: 0; overflow: hidden; will-change: clip-path; }
+.abre__foto img { width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+
+.abre__textos {
+  position: absolute; inset: 0; color: var(--hueso); opacity: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(26, 23, 20, .74), rgba(26, 23, 20, .42));
+}
+.abre__pista {
+  --slot: 36vw;
+  position: absolute; left: var(--gutter); top: 30vh;
+  display: flex; white-space: nowrap; will-change: transform;
+}
+.abre__t {
+  flex: 0 0 var(--slot);
   font-family: var(--f-titulo); font-weight: 500;
-  font-size: clamp(36px, 4.2vw, 68px); line-height: 1.02; letter-spacing: -.03em;
+  font-size: clamp(36px, 4.6vw, 80px); line-height: 1; letter-spacing: -.03em;
 }
-.pasos__fila {
-  --gap: clamp(10px, 1.1vw, 18px);
-  --w: calc((100% - 5 * var(--gap)) / 6);
-  position: relative;
-  width: min(100%, calc(240vh + 90px));
-  margin: 0 auto;
+.abre__parrafo {
+  position: absolute; left: calc(var(--gutter) + 36vw); top: calc(30vh + clamp(60px, 7vw, 120px));
+  width: min(30vw, 440px);
 }
-.paso-foto, .paso-texto {
-  position: absolute; top: 0;
-  width: var(--w);
-  left: calc(var(--slot, 0) * (var(--w) + var(--gap)));
-  transition: left .75s var(--ease);
-}
-.paso-foto { margin: 0; }
-.paso-foto__num, .paso-texto__cuenta {
-  display: block; height: 26px; margin: 0;
-  font-family: var(--f-titulo); font-weight: 500; font-size: 13px; letter-spacing: .04em;
-}
-.paso-foto__img { position: relative; aspect-ratio: 3 / 4; overflow: hidden; background: var(--arena); }
-.paso-foto__img img { width: 100%; height: 100%; object-fit: cover; }
-.paso-foto__img::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgba(26, 23, 20, .55)); }
-.paso-foto figcaption {
-  position: absolute; z-index: 1; left: 12px; right: 12px; bottom: 10px;
-  font-family: var(--f-titulo); font-weight: 500; color: var(--hueso);
-  font-size: clamp(18px, 1.6vw, 28px); line-height: .98; letter-spacing: -.02em;
-}
-.paso-texto { padding-right: 4px; }
-.paso-texto__cuenta { color: var(--cafe); }
-.paso-texto__p {
-  margin: 0; font-size: clamp(14px, .95vw, 17px); line-height: 1.45; font-weight: 400;
-  transition: opacity .3s;
-}
-.paso-texto.cambia .paso-texto__p { opacity: 0; }
+.abre__cuenta { margin: 0 0 10px; font-family: var(--f-titulo); font-size: 14px; font-weight: 500; color: var(--sol); }
+#abreP { margin: 0; font-size: clamp(16px, 1.2vw, 20px); line-height: 1.45; transition: opacity .3s; }
+.abre__parrafo.cambia #abreP { opacity: 0; }
+
+/* Contacto sube y tapa la sección fija */
+.cierre { position: relative; z-index: 2; margin-top: -100vh; margin-top: -100svh; box-shadow: 0 -24px 48px rgba(26, 23, 20, .2); }
 
 /* =========================================================
    CIERRE
@@ -591,14 +598,18 @@ button, input { font: inherit; color: inherit; }
   .card { min-height: 0; }
   .card + .card { border-left: 0; border-top: 1px solid var(--linea); }
 
-  .pasos__titulo { font-size: 34px; }
-  .pasos__fila { width: 100%; }
-  .paso-foto { width: 100%; left: 0; opacity: 0; transition: opacity .5s var(--ease); }
-  .paso-foto.activa { opacity: 1; }
-  .paso-foto__img { aspect-ratio: 4 / 5; max-height: 52vh; width: 100%; }
-  .paso-texto { position: relative; width: 100%; left: 0; transition: none; }
-  .paso-texto__cuenta { display: none; }
-  .paso-texto__p { font-size: 16px; }
+  .abre__head { width: 80vw; margin-left: -40vw; top: calc(var(--nav-h) + 3vh); }
+  .suelta figcaption { font-size: 11px; }
+  .suelta figcaption b { font-size: 12px; }
+  .suelta--1 { left: 3vw;  top: 27vh; width: 25vw; }
+  .suelta--2 { left: 3vw;  top: 66vh; width: 25vw; }
+  .suelta--3 { left: 72vw; top: 29vh; width: 25vw; }
+  .suelta--4 { left: 72vw; top: 68vh; width: 25vw; }
+  .suelta--5 { left: 34vw; top: 87vh; width: 32vw; }
+  .suelta--6, .suelta--7, .suelta--8 { display: none; }
+  .abre__pista { --slot: 78vw; top: 26vh; }
+  .abre__t { font-size: 40px; }
+  .abre__parrafo { left: var(--gutter); top: calc(26vh + 72px); width: calc(100% - 2 * var(--gutter)); }
 
   .cierre { grid-template-columns: 1fr; }
   .cierre__foto { min-height: 56vh; }

@@ -183,13 +183,18 @@
   });
 
   /* =========================================================
-     DE LA PLANTA A TU TIENDA: fila de fotos + un párrafo. Con cada tramo de
-     scroll la foto siguiente se corre a la izquierda y el párrafo pasa a su lado.
+     DE LA PLANTA A TU TIENDA: 3 fases ligadas al scroll (todas en "pantallas")
+     1) collage: las fotos sueltas suben a distintas velocidades
+     2) la foto del centro se abre a pantalla completa
+     3) los títulos pasan de derecha a izquierda y cambia el párrafo
+     Al terminar, la sección queda fija una pantalla más mientras sube Contacto.
      ========================================================= */
   (function () {
-    var sec = $('#obra'), fila = $('#pasosFila');
-    if (!sec || !fila) return;
-    var fotos = $$('.paso-foto', fila), texto = $('#pasoTexto'), elP = $('#pasoP'), elNum = $('#pasoNum');
+    var sec = $('#obra'), pin = $('#abrePin');
+    if (!sec || !pin) return;
+    var sueltas = $$('[data-vel]', pin), foto = $('#abreFoto'), img = $('img', foto);
+    var textos = $('#abreTextos'), pista = $('#abrePista'), titulos = $$('.abre__t', pista);
+    var parrafo = $('.abre__parrafo', textos), elP = $('#abreP'), elNum = $('#abreNum');
     var TEXTOS = [
       'Desarrollamos y mezclamos cada producto en nuestra planta de El Salto, Jalisco, cuidando que cubra, rinda y conserve su color.',
       'Llenamos y sellamos cada cubeta de 19 L en línea, lista para estibar y transportar.',
@@ -197,39 +202,63 @@
       'Cargamos tu pedido y te damos seguimiento por WhatsApp, del andén a tu mostrador.',
       'Pintura que cubre a la primera, se lava y mantiene su color. Eso es lo que tu cliente nota.'
     ];
-    var N = fotos.length, TRAMO = 0.6; // pantallas de scroll por paso
-    var actual = -1, raf = null, movil = false;
+    var N = titulos.length;
+    var A = 1.0, B = 0.8, PASO = 0.75, FIN = 0.6;        // largo de cada fase, en pantallas
+    var C0 = A + B, TOTAL = C0 + PASO * (N - 1) + FIN;  // scroll fijo total
+    var vh = 0, caja = null, raf = null, actual = -1;
+    var ease = function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
 
     function medir() {
-      movil = window.innerWidth < 860;
-      sec.style.height = (window.innerHeight * (1 + TRAMO * (N - 1)) + 2) + 'px';
-      var alto = fotos[0].offsetHeight;
-      if (movil) { fila.style.height = ''; fila.style.paddingTop = (alto + 14) + 'px'; }
-      else { fila.style.paddingTop = ''; fila.style.height = alto + 'px'; }
-      pintar(true);
+      vh = window.innerHeight;
+      var vw = window.innerWidth, movil = vw < 860;
+      // +1 pantalla al final: la sección sigue fija mientras Contacto sube encima
+      sec.style.height = (vh * (1 + TOTAL + 1)) + 'px';
+      var w = movil ? vw * 0.4 : Math.min(vw * 0.26, vh * 0.42);
+      var h = w * 1.25, cx = vw / 2, cy = vh * (movil ? 0.56 : 0.58);
+      caja = { t: cy - h / 2, r: vw - (cx + w / 2), b: vh - (cy + h / 2), l: cx - w / 2 };
+      pintar();
     }
-    function colocar(i) {
-      // fotos 0..i en los primeros slots, el texto en i+1, el resto después
-      fotos.forEach(function (f, k) {
-        f.style.setProperty('--slot', k <= i ? k : k + 1);
-        f.classList.toggle('activa', k === i);
-      });
-      texto.style.setProperty('--slot', i + 1);
-    }
-    function pintar(forzar) {
+    function pintar() {
       raf = null;
-      var recorrido = window.innerHeight * TRAMO;
-      var i = clamp(Math.floor(-sec.getBoundingClientRect().top / recorrido + 0.0001), 0, N - 1);
-      if (i === actual && !forzar) return;
-      var primera = actual === -1;
-      actual = i;
-      colocar(i);
-      elNum.textContent = '0' + (i + 1);
-      if (primera || reduce) { elP.textContent = TEXTOS[i]; return; }
-      texto.classList.add('cambia');
-      setTimeout(function () { elP.textContent = TEXTOS[actual]; texto.classList.remove('cambia'); }, 320);
+      var y = -sec.getBoundingClientRect().top / vh;   // pantallas recorridas dentro de la sección
+      if (y < -1 || y > TOTAL + 1.2) return;           // fuera de vista: no hace falta pintar
+
+      // Fase 1 (y continúa en la 2): las sueltas suben y se desvanecen al abrirse la foto
+      var pA = clamp(y / C0, 0, 1), pB = ease(clamp((y - A) / B, 0, 1));
+      sueltas.forEach(function (el) {
+        var v = +el.getAttribute('data-vel');
+        var dy = reduce ? 0 : -pA * v * 0.55 * vh;
+        el.style.transform = 'translate3d(0,' + dy + 'px,0)';
+        el.style.opacity = 1 - clamp((y - A) / (B * 0.6), 0, 1);
+      });
+
+      // Fase 2: la caja central se abre a pantalla completa
+      var k = 1 - pB;
+      foto.style.clipPath = 'inset(' + (caja.t * k) + 'px ' + (caja.r * k) + 'px ' + (caja.b * k) + 'px ' + (caja.l * k) + 'px)';
+      img.style.transform = 'scale(' + (1 + 0.18 * k) + ')';
+      textos.style.opacity = clamp((y - (A + B * 0.7)) / (B * 0.3), 0, 1);
+
+      // Fase 3: los títulos pasan; el activo en blanco, los demás atenuados
+      var c = clamp((y - C0) / PASO, 0, N - 1);
+      var slot = titulos[0].offsetWidth;
+      pista.style.transform = 'translate3d(' + (-c * slot) + 'px,0,0)';
+      titulos.forEach(function (t, i) {
+        var d = i - c;
+        t.style.opacity = d < 0 ? Math.max(0, 1 + d * 1.6) : 1 - Math.min(1, d) * 0.65;
+      });
+      var i = Math.round(c);
+      if (i !== actual) {
+        var primera = actual === -1;
+        actual = i;
+        elNum.textContent = '0' + (i + 1);
+        if (primera || reduce) { elP.textContent = TEXTOS[i]; }
+        else {
+          parrafo.classList.add('cambia');
+          setTimeout(function () { elP.textContent = TEXTOS[actual]; parrafo.classList.remove('cambia'); }, 300);
+        }
+      }
     }
-    window.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(function () { pintar(false); }); }, { passive: true });
+    window.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(pintar); }, { passive: true });
     window.addEventListener('resize', medir);
     window.addEventListener('load', medir);
     medir();
