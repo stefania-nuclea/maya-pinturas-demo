@@ -462,10 +462,17 @@ button, input { font: inherit; color: inherit; }
    ========================================================= */
 .cierre { display: grid; grid-template-columns: 5fr 7fr; background: var(--blanco); }
 .cierre__foto { position: relative; min-height: 100%; }
-.cierre__foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.cierre__cont { padding: clamp(64px, 8vw, 128px) var(--gutter); }
-.form { margin-top: 8px; max-width: 640px; }
-.form__perfil { border: 0; padding: 0; margin: 0 0 28px; display: flex; flex-wrap: wrap; gap: 8px; }
+.cierre__foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 82%; /* encuadre bajo: se ve el pallet con producto */ }
+/* Contacto entra completo en una pantalla (escritorio) */
+.cierre { height: 100vh; height: 100svh; min-height: 620px; }
+.cierre__cont {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: calc(var(--nav-h) + 16px) var(--gutter) 28px;
+}
+.cierre .h2 { font-size: clamp(32px, 3.4vw, 54px); margin-bottom: 14px; }
+.cierre .lead { font-size: clamp(17px, 1.3vw, 21px); margin-bottom: 18px; }
+.form { margin-top: 4px; max-width: 760px; }
+.form__perfil { border: 0; padding: 0; margin: 0 0 18px; display: flex; flex-wrap: wrap; gap: 8px; }
 .form__perfil legend { font-weight: 500; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 12px; padding: 0; }
 .form__perfil label { position: relative; }
 .form__perfil input { position: absolute; opacity: 0; }
@@ -476,7 +483,7 @@ button, input { font: inherit; color: inherit; }
   transition: background-color .25s, color .25s, border-color .25s;
 }
 .form__perfil input:checked + span { background: var(--cafe); border-color: var(--cafe); color: var(--hueso); }
-.form__campos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.form__campos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 10px; }
 .campo { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
 .campo input {
   border: 0; border-bottom: 1px solid var(--tinta); background: transparent;
@@ -485,7 +492,7 @@ button, input { font: inherit; color: inherit; }
 }
 .campo input:focus { outline: none; border-bottom: 2px solid var(--cafe); }
 .form__error { min-height: 1.4em; margin: 0 0 12px; color: #A21F35; font-size: 15px; font-weight: 500; }
-.cierre__datos { list-style: none; padding: 32px 0 0; margin: 40px 0 0; border-top: 1px solid var(--linea); display: grid; grid-template-columns: auto 1fr; gap: 10px 32px; font-size: 16px; }
+.cierre__datos { list-style: none; padding: 18px 0 0; margin: 18px 0 0; border-top: 1px solid var(--linea); display: grid; grid-template-columns: auto 1fr; gap: 10px 32px; font-size: 16px; }
 .cierre__datos li { display: contents; }
 .cierre__datos span { font-weight: 500; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--cafe); padding-top: 3px; }
 
@@ -645,7 +652,8 @@ button, input { font: inherit; color: inherit; }
   .abre__t { font-size: 44px; }
   .abre__parrafo { left: 10vw; top: 52vh; width: 80vw; }
 
-  .cierre { grid-template-columns: 1fr; }
+  .cierre { grid-template-columns: 1fr; height: auto; min-height: 0; }
+  .cierre__cont { padding: 56px var(--gutter); }
   .cierre__foto { min-height: 56vh; }
   .form__campos { grid-template-columns: 1fr; }
 
