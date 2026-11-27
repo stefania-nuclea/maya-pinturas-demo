@@ -467,11 +467,12 @@ button, input { font: inherit; color: inherit; }
 /* mínimo una pantalla; si el contenido no entra, la sección crece (nunca se desborda sobre el footer) */
 .cierre { min-height: 100vh; min-height: 100svh; }
 .cierre__cont {
-  --aire: clamp(40px, 6vh, 72px);
+  /* mismo aire arriba y abajo medido desde los bordes de la sección (el contenido va centrado);
+     el mínimo supera al menú fijo para que el título nunca quede tapado */
+  --aire: max(calc(var(--nav-h) + 24px), 11vh);
   display: flex; flex-direction: column; justify-content: center;
-  /* mismo aire blanco arriba y abajo: arriba se suma el alto del menú fijo, que tapa esa franja */
   /* margen lateral amplio entre la foto y el texto (~5,5% del ancho) */
-  padding: calc(var(--nav-h) + var(--aire)) clamp(32px, 5.5vw, 112px) var(--aire);
+  padding: var(--aire) clamp(32px, 5.5vw, 112px);
 }
 .cierre .h2 { font-size: clamp(32px, 3.4vw, 54px); margin-bottom: 14px; }
 .cierre .lead { font-size: clamp(17px, 1.3vw, 21px); margin-bottom: 18px; }
