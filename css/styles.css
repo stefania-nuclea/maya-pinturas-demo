@@ -464,10 +464,13 @@ button, input { font: inherit; color: inherit; }
 .cierre__foto { position: relative; min-height: 100%; }
 .cierre__foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 82%; /* encuadre bajo: se ve el pallet con producto */ }
 /* Contacto entra completo en una pantalla (escritorio) */
-.cierre { height: 100vh; height: 100svh; min-height: 620px; }
+/* mínimo una pantalla; si el contenido no entra, la sección crece (nunca se desborda sobre el footer) */
+.cierre { min-height: 100vh; min-height: 100svh; }
 .cierre__cont {
+  --aire: clamp(40px, 6vh, 72px);
   display: flex; flex-direction: column; justify-content: center;
-  padding: calc(var(--nav-h) + 16px) var(--gutter) 28px;
+  /* mismo aire blanco arriba y abajo: arriba se suma el alto del menú fijo, que tapa esa franja */
+  padding: calc(var(--nav-h) + var(--aire)) var(--gutter) var(--aire);
 }
 .cierre .h2 { font-size: clamp(32px, 3.4vw, 54px); margin-bottom: 14px; }
 .cierre .lead { font-size: clamp(17px, 1.3vw, 21px); margin-bottom: 18px; }
