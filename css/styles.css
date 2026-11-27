@@ -470,7 +470,8 @@ button, input { font: inherit; color: inherit; }
   --aire: clamp(40px, 6vh, 72px);
   display: flex; flex-direction: column; justify-content: center;
   /* mismo aire blanco arriba y abajo: arriba se suma el alto del menú fijo, que tapa esa franja */
-  padding: calc(var(--nav-h) + var(--aire)) var(--gutter) var(--aire);
+  /* margen lateral amplio entre la foto y el texto (~5,5% del ancho) */
+  padding: calc(var(--nav-h) + var(--aire)) clamp(32px, 5.5vw, 112px) var(--aire);
 }
 .cierre .h2 { font-size: clamp(32px, 3.4vw, 54px); margin-bottom: 14px; }
 .cierre .lead { font-size: clamp(17px, 1.3vw, 21px); margin-bottom: 18px; }
