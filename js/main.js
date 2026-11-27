@@ -396,7 +396,8 @@
   function irA(i) {
     var r = rangoSeccion();
     var destino = r.top + (i / TRAMOS) * r.largo + 2;
-    if (lenis) lenis.scrollTo(destino); else window.scrollTo({ top: destino, behavior: reduce ? 'auto' : 'smooth' });
+    // Salto directo al producto elegido: no recorre los intermedios (evita cambios de color y giros en cadena)
+    if (lenis) lenis.scrollTo(destino, { immediate: true }); else window.scrollTo({ top: destino, behavior: 'auto' });
   }
 
   function ajustarTitulo() {
@@ -654,24 +655,37 @@
       });
     }
 
-    var rot = 0, pend = true, ultimo = '';
+    var rot = 0, pend = true, ultimo = '', tPrev = 0;
+    var DOS_PI = Math.PI * 2;
     function pedirFrame() { pend = true; }
     function frame() {
+      var ahora = performance.now();
+      var dt = Math.min(0.05, tPrev ? (ahora - tPrev) / 1000 : 0.016); // seg., con tope por si la pestaña estuvo oculta
+      tPrev = ahora;
       var k = estado.k, s = estado.s;
-      var objetivo = reduce ? 0 : -(k + s) * Math.PI * 2;
+      // Orientación objetivo dentro de UNA vuelta: cada cambio de producto es un solo giro.
+      var objetivo = reduce ? 0 : -s * DOS_PI;
+      // Camino corto: la diferencia se lleva a [-π, π], así nunca da vueltas de más
+      // (antes, al saltar varios productos, giraba varias vueltas seguidas y "temblaba").
+      var diff = objetivo - rot;
+      diff = diff - DOS_PI * Math.round(diff / DOS_PI);
       // Solo se vuelve a dibujar si algo se mueve: ahorra GPU cuando la cubeta está quieta
-      var quieta = Math.abs(objetivo - rot) < 0.0005 && Math.abs(tilt.tx - tilt.x) < 0.0005 && Math.abs(tilt.ty - tilt.y) < 0.0005;
+      var quieta = Math.abs(diff) < 0.0005 && Math.abs(tilt.tx - tilt.x) < 0.0005 && Math.abs(tilt.ty - tilt.y) < 0.0005;
       var clave = k + '|' + s.toFixed(3);
       if (quieta && !pend && clave === ultimo) return;
       pend = false; ultimo = clave;
-      rot += (objetivo - rot) * 0.14;
-      tilt.x += (tilt.tx - tilt.x) * 0.08; tilt.y += (tilt.ty - tilt.y) * 0.08;
+      // Suavizado según el tiempo real (igual de suave a 60 o a 120 cuadros por segundo)
+      rot += diff * (1 - Math.exp(-dt * 7));
+      rot = rot - DOS_PI * Math.round(rot / DOS_PI);
+      var aT = 1 - Math.exp(-dt * 4);
+      tilt.x += (tilt.tx - tilt.x) * aT; tilt.y += (tilt.ty - tilt.y) * aT;
       cuerpo.rotation.y = rot;
       grupo.rotation.x = tilt.x; grupo.rotation.y = tilt.y;
 
       var sig = Math.min(k + 1, TOTAL - 1);
-      if (matA.map !== texturas[k]) { matA.map = texturas[k]; matA.needsUpdate = true; }
-      if (matB.map !== texturas[sig]) { matB.map = texturas[sig]; matB.needsUpdate = true; }
+      // Cambiar la textura no requiere recompilar el material (needsUpdate frenaba un instante la animación)
+      if (matA.map !== texturas[k]) matA.map = texturas[k];
+      if (matB.map !== texturas[sig]) matB.map = texturas[sig];
       var f = clamp((s - 0.3) / 0.4, 0, 1);
       matB.opacity = f;
       tapaMat.color.copy(colTapa[k]).lerp(colTapa[sig], f);
